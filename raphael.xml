@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Local manifest for xiaomi/raphael (Snapdragon 855, msmnile).
+
+  The device sets BOARD_USES_QCOM_HARDWARE := true (in
+  device/xiaomi/sm8150-common/BoardConfigCommon.mk), which routes Make-side
+  module resolution to hardware/qcom-caf/sm8150/*. Soong (Android.bp) has no
+  equivalent guard, so any generic hardware/qcom/* trees that get synced
+  would collide with the CAF/sm8150 versions of the same module names.
+
+  This manifest does two jobs:
+   1. <remove-project> the conflicting / wrong-SoC trees so they don't land
+      on disk.
+   2. Override LineageOS upstream sources with our private forks at
+      erg-raphael-5-4 for the three trees where we maintain device-specific
+      patches that would otherwise be wiped on `repo sync`.
+
+  Cloning the private forks requires a credential. Set up ~/.netrc or
+  configure git URL rewrites (git config global url.insteadOf) before
+  the first sync.
+-->
+<manifest>
+
+  <!-- Remote for our private forks -->
+  <remote name="erg-raphael" fetch="https://github.com/" />
+
+  <!-- 1. Remove projects we want gone entirely -->
+
+  <!-- Generic audio HAL: collides with hardware/qcom-caf/sm8150/audio. -->
+  <remove-project name="LineageOS/android_hardware_qcom_audio" path="hardware/qcom/audio" />
+
+  <!-- Wrong-SoC trees. sdm845 = SD845, sm7250 = SD765 — not raphael. -->
+  <remove-project name="LineageOS/android_hardware_qcom_sdm845_display" />
+  <remove-project name="LineageOS/android_hardware_qcom_sdm845_gps" />
+  <remove-project name="LineageOS/android_hardware_qcom_sm7250_display" />
+  <remove-project name="LineageOS/android_hardware_qcom_sm7250_gps" />
+
+  <!-- Right SoC but redundant with hardware/qcom-caf/sm8150/. -->
+  <remove-project name="LineageOS/android_hardware_qcom_sm8150_display" />
+  <remove-project name="LineageOS/android_hardware_qcom_sm8150_gps" />
+
+  <!-- 2. Override upstream sources with our private forks. -->
+
+  <!-- sm8150 display: our fork disables the duplicate modules so sm8350's
+       composer-service architecture takes over. -->
+  <remove-project name="LineageOS/android_hardware_qcom_display"
+                  path="hardware/qcom-caf/sm8150/display" />
+  <project name="erg-raphael-5-4/android_hardware_qcom_display_sm8150"
+           path="hardware/qcom-caf/sm8150/display"
+           remote="erg-raphael"
+           revision="lineage-23.2-caf-sm8150-raphael" />
+
+  <!-- sm8150 media: heavily patched (vidc_v4l2_compat.h, c2d2.h symlink,
+       msm_vidc_vui_display_info_payload member rename, local include_dirs
+       to find media/msm_*.h kernel UAPI). -->
+  <remove-project name="LineageOS/android_hardware_qcom_media"
+                  path="hardware/qcom-caf/sm8150/media" />
+  <project name="erg-raphael-5-4/android_hardware_qcom_media_sm8150"
+           path="hardware/qcom-caf/sm8150/media"
+           remote="erg-raphael"
+           revision="lineage-23.2-caf-sm8150-raphael" />
+
+  <!-- sm8350 audio: our fork disables the duplicate audio HAL modules
+       (sm8150 audio HAL wins on this build). -->
+  <remove-project name="LineageOS/android_hardware_qcom_audio"
+                  path="hardware/qcom-caf/sm8350/audio" />
+  <project name="erg-raphael-5-4/android_hardware_qcom_audio_sm8350"
+           path="hardware/qcom-caf/sm8350/audio"
+           remote="erg-raphael"
+           revision="lineage-23.2-caf-sm8350-raphael" />
+
+</manifest>
