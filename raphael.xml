@@ -79,5 +79,16 @@
            remote="erg-raphael"
            revision="MI_RAPHAEL_5.4" />
 
+  <!-- frameworks/opt/net/wifi - our fork carries the WifiTrackerLib fix
+       so transition-mode WPA2/WPA3 (and OWE) APs are saved as the
+       stronger AKM (SAE / OWE) by the Settings UI, instead of the AOSP
+       default that downgrades to PSK/Open and breaks association on
+       APs that mandate SAE. -->
+  <remove-project name="platform/frameworks/opt/net/wifi" />
+  <project name="erg-raphael-5-4/android_frameworks_opt_net_wifi"
+           path="frameworks/opt/net/wifi"
+           remote="erg-raphael"
+           revision="25Q4-release-raphael" />
+
 </manifest>
 
