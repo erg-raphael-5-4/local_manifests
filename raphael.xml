@@ -24,6 +24,9 @@
   <!-- Remote for our private forks -->
   <remote name="erg-raphael" fetch="https://github.com/" />
 
+  <!-- Public raphael sources (device tree + vendor blobs). -->
+  <remote name="ducks" fetch="https://github.com/" />
+
   <!-- 1. Remove projects we want gone entirely -->
 
   <!-- Generic audio HAL: collides with hardware/qcom-caf/sm8150/audio. -->
@@ -89,6 +92,47 @@
            path="frameworks/opt/net/wifi"
            remote="erg-raphael"
            revision="25Q4-release-raphael" />
+
+  <!-- Device trees + hardware/xiaomi - our private forks. Not in the
+       upstream manifest; roomservice/lineage.dependencies would otherwise
+       pull the public LineageOS trees and lose our patches (screen-off FOD
+       config + namespace + libgf_hal pin, raphael UDFPS + namespace fixes,
+       and the raphael Session.cpp NULL guard). Declared here so repo owns
+       them and roomservice leaves them alone. -->
+  <!-- raphael device tree. NOT taken from erg-raphael-5-4/android_device_xiaomi_raphael:
+       that repo is a second fork of sm8150-common (all 715 commits prefixed
+       "sm8150-common:"; AndroidProducts.mk / lineage_raphael.mk / BoardConfig.mk /
+       device.mk have never existed in it), so it carries no product definition and
+       would duplicate every Soong module in device/xiaomi/sm8150-common.
+       DUCKS-QCM-5-4 carries the real tree on lineage-23.2, including motor/ (pop-up
+       camera), tfa98xx/ and qdcm/. -->
+  <project name="DUCKS-QCM-5-4/android_device_xiaomi_raphael"
+           path="device/xiaomi/raphael"
+           remote="ducks"
+           revision="lineage-23.2" />
+
+  <!-- Proprietary blobs. Absent from the original manifest entirely; without
+       these the build has no camera/audio/DSP/fingerprint firmware and cannot
+       produce a flashable image. -->
+  <project name="DUCKS-QCM-5-4/proprietary_vendor_xiaomi_raphael"
+           path="vendor/xiaomi/raphael"
+           remote="ducks"
+           revision="lineage-23.2" />
+
+  <project name="DUCKS-QCM-5-4/proprietary_vendor_xiaomi_sm8150-common"
+           path="vendor/xiaomi/sm8150-common"
+           remote="ducks"
+           revision="lineage-23.2" />
+
+  <project name="erg-raphael-5-4/android_device_xiaomi_sm8150-common"
+           path="device/xiaomi/sm8150-common"
+           remote="erg-raphael"
+           revision="lineage-23.2-raphael" />
+
+  <project name="erg-raphael-5-4/android_hardware_xiaomi"
+           path="hardware/xiaomi"
+           remote="erg-raphael"
+           revision="lineage-23.2-raphael" />
 
 </manifest>
 
